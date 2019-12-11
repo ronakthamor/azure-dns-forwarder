@@ -68,7 +68,7 @@
       "location": "[parameters('location')]",
       "nicName": "[concat(parameters('vmName'), '-', 'nic')]",
       "pipName": "[concat(parameters('vmName'), '-', 'pip')]",
-      "artifactsBaseUrl": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/301-dns-forwarder",
+      "artifactsBaseUrl": "https://raw.githubusercontent.com/ronakthamor/azure-dns-forwarder/master",
       "scriptUrl": "[concat(variables('artifactsBaseUrl'),'/','forwarderSetup.sh')]",
       "linuxConfiguration": {
         "disablePasswordAuthentication": true,
@@ -239,6 +239,9 @@
           "typeHandlerVersion": "2.0",
           "autoUpgradeMinorVersion": true,
           "settings": {
+            "fileUris": [
+              "[variables('scriptUrl')]"
+            ],
             "commandToExecute": "[concat('sh forwarderSetup.sh',' ',parameters('forwardIP'),' ',variables('vnetAddressPrefix'), ' ',variables('vnet_gateway_address_pool'))]"
           }
         }
