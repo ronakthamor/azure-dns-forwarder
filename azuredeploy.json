@@ -70,7 +70,6 @@
       "pipName": "[concat(parameters('vmName'), '-', 'pip')]",
       "artifactsBaseUrl": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/301-dns-forwarder",
       "scriptUrl": "[concat(variables('artifactsBaseUrl'),'/','forwarderSetup.sh')]",
-      "scriptFile": "forwarderSetup.sh",
       "linuxConfiguration": {
         "disablePasswordAuthentication": true,
         "ssh": {
@@ -113,7 +112,25 @@
         "comments": "An NSG to prevent inbound traffic other than SSH, set sourceAddressPrefix to restrict access further or block all together (or remove the public ip) and ssh in from another vm",
         "name": "[variables('nsgName')]",
         "apiVersion": "2015-06-15",
-        "location": "[variables('location')]"
+        "location": "[variables('location')]",
+        "properties": {
+          "securityRules": [
+            {
+              "name": "allow_ssh_in",
+              "properties": {
+                "description": "The only thing allowed is SSH",
+                "protocol": "Tcp",
+                "sourcePortRange": "*",
+                "destinationPortRange": "22",
+                "sourceAddressPrefix": "*",
+                "destinationAddressPrefix": "*",
+                "access": "Allow",
+                "priority": 100,
+                "direction": "Inbound"
+              }
+            }
+          ]
+        }
       },
       {
         "type": "Microsoft.Network/publicIPAddresses",
@@ -141,7 +158,7 @@
               "name": "ipconfig1",
               "properties": {
                 "privateIPAllocationMethod": "Static",
-                "privateIPAddress": "[variable('privateIPAddress')]",
+                "privateIPAddress": "[variables('privateIPAddress')]",
                 "publicIPAddress": {
                   "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('pipName'))]"
                 },
@@ -222,9 +239,6 @@
           "typeHandlerVersion": "2.0",
           "autoUpgradeMinorVersion": true,
           "settings": {
-            "fileNames": [
-              "[variables('scriptFile')]"
-            ],
             "commandToExecute": "[concat('sh forwarderSetup.sh',' ',parameters('forwardIP'),' ',variables('vnetAddressPrefix'), ' ',variables('vnet_gateway_address_pool'))]"
           }
         }
