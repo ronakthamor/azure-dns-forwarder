@@ -112,25 +112,7 @@
         "comments": "An NSG to prevent inbound traffic other than SSH, set sourceAddressPrefix to restrict access further or block all together (or remove the public ip) and ssh in from another vm",
         "name": "[variables('nsgName')]",
         "apiVersion": "2015-06-15",
-        "location": "[variables('location')]",
-        "properties": {
-          "securityRules": [
-            {
-              "name": "allow_ssh_in",
-              "properties": {
-                "description": "The only thing allowed is SSH",
-                "protocol": "Tcp",
-                "sourcePortRange": "*",
-                "destinationPortRange": "22",
-                "sourceAddressPrefix": "*",
-                "destinationAddressPrefix": "*",
-                "access": "Allow",
-                "priority": 100,
-                "direction": "Inbound"
-              }
-            }
-          ]
-        }
+        "location": "[variables('location')]"
       },
       {
         "type": "Microsoft.Network/publicIPAddresses",
