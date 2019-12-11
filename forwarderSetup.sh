@@ -17,6 +17,7 @@ sudo apt-get install bind9 -y
 sudo cat > named.conf.options << EndOFNamedConfOptions
 acl goodclients {
     $2;
+    $3;
     localhost;
     localnets;
 };
@@ -33,7 +34,7 @@ options {
         };
         forward only;
 
-        dnssec-validation auto;
+        dnssec-validation no;
 
         auth-nxdomain no;    # conform to RFC1035
         listen-on { any; };

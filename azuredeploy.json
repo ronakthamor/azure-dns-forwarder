@@ -60,14 +60,17 @@
       "nsgName": "dnsproxy-nsg",
       "vnetName": "mts-VNET",
       "vnetAddressPrefix": "10.0.0.0/12",
-      "subNet1Name": "mts-common-SUBNET",
-      "subNet1Prefix": "10.0.30.0/24",
+      "vnet_gateway_address_pool": "172.20.21.0/24",
+      "subNet1Name": "mts-dns-proxy-SUBNET",
+      "subNet1Prefix": "10.0.10.0/24",
+      "privateIPAddress": "10.0.10.10",
       "storType": "Standard_LRS",
       "location": "[parameters('location')]",
       "nicName": "[concat(parameters('vmName'), '-', 'nic')]",
       "pipName": "[concat(parameters('vmName'), '-', 'pip')]",
       "artifactsBaseUrl": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/301-dns-forwarder",
       "scriptUrl": "[concat(variables('artifactsBaseUrl'),'/','forwarderSetup.sh')]",
+      "scriptFile": "forwarderSetup.sh",
       "linuxConfiguration": {
         "disablePasswordAuthentication": true,
         "ssh": {
@@ -110,25 +113,7 @@
         "comments": "An NSG to prevent inbound traffic other than SSH, set sourceAddressPrefix to restrict access further or block all together (or remove the public ip) and ssh in from another vm",
         "name": "[variables('nsgName')]",
         "apiVersion": "2015-06-15",
-        "location": "[variables('location')]",
-        "properties": {
-          "securityRules": [
-            {
-              "name": "allow_ssh_in",
-              "properties": {
-                "description": "The only thing allowed is SSH",
-                "protocol": "Tcp",
-                "sourcePortRange": "*",
-                "destinationPortRange": "22",
-                "sourceAddressPrefix": "*",
-                "destinationAddressPrefix": "*",
-                "access": "Allow",
-                "priority": 100,
-                "direction": "Inbound"
-              }
-            }
-          ]
-        }
+        "location": "[variables('location')]"
       },
       {
         "type": "Microsoft.Network/publicIPAddresses",
@@ -155,12 +140,13 @@
             {
               "name": "ipconfig1",
               "properties": {
-                "privateIPAllocationMethod": "Dynamic",
+                "privateIPAllocationMethod": "Static",
+                "privateIPAddress": "[variable('privateIPAddress')]",
                 "publicIPAddress": {
                   "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('pipName'))]"
                 },
                 "subnet": {
-                  "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', variables('vnetName')), '/subnets/', variables('subnet1Name'))]"
+                  "id": "[concat('/subscriptions/9aa99aae-30dd-487b-83a0-e5f1b223e872/resourceGroups/mts-vnet-subnets/providers/Microsoft.Network/virtualNetworks/', variables('vnetName'), '/subnets/', variables('subnet1Name'))]"
                 },
                 "networkSecurityGroup": {
                   "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('nsgName'))]"
@@ -236,10 +222,10 @@
           "typeHandlerVersion": "2.0",
           "autoUpgradeMinorVersion": true,
           "settings": {
-            "fileUris": [
-              "[variables('scriptUrl')]"
+            "fileNames": [
+              "[variables('scriptFile')]"
             ],
-            "commandToExecute": "[concat('sh forwarderSetup.sh',' ',parameters('forwardIP'),' ', variables('vnetAddressPrefix'))]"
+            "commandToExecute": "[concat('sh forwarderSetup.sh',' ',parameters('forwardIP'),' ',variables('vnetAddressPrefix'), ' ',variables('vnet_gateway_address_pool'))]"
           }
         }
       }
