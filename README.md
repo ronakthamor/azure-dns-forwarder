@@ -18,4 +18,10 @@ In order to access domain name from your local browser: <br/>
 
 1) Connect to point to site VPN <br/>
 2) Add DNS in Macbook from Settings -> Network -> Advanced... -> DNS -> Add DNSProxy server's private IP here (get it from azure portal). <br/>
-3) Access DNS from browser.
+3) Create private DNS Zone in azure and add virtual netwok link (mts-VNET) <br/>
+4) Add A record to private DNS zone of any VM (has to be in same VNET). Value will be VM's private IP. <br/>
+5) Access DNS from browser.
+
+<br/>
+
+Follow this guide to integrate it with k8s private IP: https://github.com/kubernetes-sigs/external-dns/blob/master/docs/tutorials/azure-private-dns.md
